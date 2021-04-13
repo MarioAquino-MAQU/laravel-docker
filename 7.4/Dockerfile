@@ -1,4 +1,4 @@
-FROM php:7.4-cli
+FROM php:7.4-fpm
 
 # Install production dependencies
 RUN apt-get update && apt-get install -y \
@@ -33,8 +33,12 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     odbcinst \
     odbcinst1debian2 \
-    libodbc1 \
-    unixodbc
+    libodbc1
+
+#ODBC config...
+RUN apt-get install unixodbc unixodbc-dev -y \
+ && docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
+ && docker-php-ext-install pdo_odbc
 
 COPY ./ibm-iaccess-1.1.0.14-1.0.amd64.deb /ibm-iaccess-1.1.0.14-1.0.amd64.deb
 RUN dpkg -i /ibm-iaccess-1.1.0.14-1.0.amd64.deb \
@@ -56,6 +60,7 @@ RUN docker-php-ext-enable \
 ## Configure php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
+
 ## Install php extensions
 RUN docker-php-ext-install \
     bcmath \
@@ -72,6 +77,7 @@ RUN docker-php-ext-install \
     pdo_sqlite \
     pcntl \
     soap \
+    sockets \
     tokenizer \
     xml \
     zip
