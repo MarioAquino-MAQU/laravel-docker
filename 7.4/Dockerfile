@@ -1,40 +1,45 @@
-FROM php:7.4-alpine
-
-# Install dev dependencies
-RUN apk add --no-cache --virtual .build-deps \
-    $PHPIZE_DEPS \
-    curl-dev \
-    imagemagick-dev \
-    libtool \
-    libxml2-dev \
-    postgresql-dev \
-    sqlite-dev
+FROM php:7.4-cli
 
 # Install production dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     bash \
     curl \
-    freetype-dev \
+    default-mysql-client \
+    dpkg \
     g++ \
     gcc \
     git \
-    icu-dev \
-    icu-libs \
-    imagemagick \
+    #icu-dev \
+    #icu-libs \
+    #imagemagick \
+    libcurl4-openssl-dev \
+    libmagickwand-dev \
+    libmagickcore-dev \
     libc-dev \
-    libjpeg-turbo-dev \
+    #libturbojpeg \
     libpng-dev \
     libzip-dev \
+    libfreetype6-dev \
+    libonig-dev \
     make \
-    mysql-client \
     nodejs \
-    nodejs-npm \
-    oniguruma-dev \
     yarn \
     openssh-client \
-    postgresql-libs \
+    #postgresql-libs \
+    postgresql-common \
+    postgresql-server-dev-all \
+    libsqlite3-dev \
     rsync \
-    zlib-dev
+    zlib1g-dev \
+    odbcinst \
+    odbcinst1debian2 \
+    libodbc1 \
+    unixodbc
+
+COPY ./ibm-iaccess-1.1.0.14-1.0.amd64.deb /ibm-iaccess-1.1.0.14-1.0.amd64.deb
+RUN dpkg -i /ibm-iaccess-1.1.0.14-1.0.amd64.deb \
+    && rm /ibm-iaccess-1.1.0.14-1.0.amd64.deb
+
 
 # Install PECL and PEAR extensions
 RUN pecl install \
@@ -48,10 +53,10 @@ RUN docker-php-ext-enable \
     imagick \
     xdebug
 
-# Configure php extensions
+## Configure php extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
-# Install php extensions
+## Install php extensions
 RUN docker-php-ext-install \
     bcmath \
     calendar \
@@ -81,7 +86,7 @@ RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/
 RUN composer global require "squizlabs/php_codesniffer=*"
 
 # Cleanup dev dependencies
-RUN apk del -f .build-deps
+
 
 # Setup working directory
 WORKDIR /var/www
