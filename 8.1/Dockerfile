@@ -77,7 +77,8 @@ RUN docker-php-ext-install \
     pcntl \
     soap \
     sockets \
-    tokenizer \
+    #Already provided
+    #tokenizer \
     xml \
     zip
 
