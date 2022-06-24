@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     make \
+    unzip \
     nodejs \
     yarn \
     openssh-client \
